@@ -1,0 +1,23 @@
+{
+  "name": "test-pipeline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Test script launched!\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TomFern/test-pipeline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TomFern/test-pipeline/issues"
+  },
+  "homepage": "https://github.com/TomFern/test-pipeline#readme",
+  "dependencies": {
+    "typescript": "^5.0.4"
+  }
+}

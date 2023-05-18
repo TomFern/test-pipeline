@@ -1,24 +1,30 @@
 
 version: v1.0
-name: Build and push
+name: Node.js project
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 
 blocks:
-  - name: Build and push
+  - name: Build and cache dependencies
     task:
-      # Pull in environment variables from the "docker" secret
-      secrets:
-        - name: dockerhub-secrets
-      prologue:
-        commands:
-          # Authenticate to the registry for all jobs in the block
-          - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
       jobs:
-        - name: Build and push
+        - name: Build and cache
           commands:
             - checkout
-            - docker build -t <your-dockerhub-username>/<image-name>:<tag> .
-            - docker push <your-dockerhub-username>/<image-name>:<tag>
+            - cache restore
+            - npm install
+            - npm run build
+            - cache store
+
+  - name: Tests
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+      jobs:
+        - name: Everything
+          commands:
+            - npm test
