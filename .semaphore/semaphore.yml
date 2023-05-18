@@ -1,30 +1,25 @@
 
 version: v1.0
-name: Node.js project
+name: Build and Test Go Project
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 
 blocks:
-  - name: Build and cache dependencies
+  - name: Build and Store Artifact
     task:
       jobs:
-        - name: Build and cache
+        - name: Build
           commands:
             - checkout
-            - cache restore
-            - npm install
-            - npm run build
-            - cache store
+            - go build -o myapp
+            - artifact push workflow myapp
 
-  - name: Tests
+  - name: Test
     task:
-      prologue:
-        commands:
-          - checkout
-          - cache restore
       jobs:
-        - name: Everything
+        - name: Retrieve Artifact and Test
           commands:
-            - npm test
+            - artifact pull workflow myapp
+            - go test ./...

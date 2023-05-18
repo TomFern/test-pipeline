@@ -1,0 +1,30 @@
+
+version: v1.0
+name: Node.js project
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: Build and cache dependencies
+    task:
+      jobs:
+        - name: Build and cache
+          commands:
+            - checkout
+            - cache restore
+            - npm install
+            - npm run build
+            - cache store
+
+  - name: Tests
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+      jobs:
+        - name: Everything
+          commands:
+            - npm test
