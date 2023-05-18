@@ -1,24 +1,20 @@
-
 version: v1.0
 name: Build and push
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
 blocks:
   - name: Build and push
     task:
-      # Pull in environment variables from the "docker" secret
       secrets:
-        - name: dockerhub-secrets
+        - name: dockerhub
       prologue:
         commands:
-          # Authenticate to the registry for all jobs in the block
-          - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+          - 'echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin'
       jobs:
         - name: Build and push
           commands:
             - checkout
-            - docker build -t <your-dockerhub-username>/<image-name>:<tag> .
-            - docker push <your-dockerhub-username>/<image-name>:<tag>
+            - 'docker build -t <your-dockerhub-username>/<image-name>:<tag> .'
+            - 'docker push <your-dockerhub-username>/<image-name>:<tag>'
