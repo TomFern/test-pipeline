@@ -5,7 +5,6 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
 blocks:
   - name: Build and Test
     task:
@@ -14,16 +13,13 @@ blocks:
           - checkout
           - sem-version go 1.16
           - go get ./...
-
       jobs:
         - name: Build
           commands:
-            - go build -v ./...
-
+            - go build
         - name: Test
           commands:
-            - gotestsum --junitfile junit.xml ./...
-
+            - go test ./...
       epilogue:
         always:
           commands:
