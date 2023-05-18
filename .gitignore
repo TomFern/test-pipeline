@@ -1,4 +1,5 @@
 node_modules/
 
 # Ignore master key for decrypting credentials and more.
+tmp/
 /config/master.key
