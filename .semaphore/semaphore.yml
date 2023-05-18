@@ -1,12 +1,9 @@
-
 version: v1.0
 name: My Ruby on Rails Project
-
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
 blocks:
   - name: Setup
     task:
@@ -18,7 +15,6 @@ blocks:
             - sem-version ruby 2.6.0
             - bundle install --deployment -j 4 --path vendor/bundle
             - cache store
-
   - name: Code scanning
     task:
       jobs:
@@ -28,9 +24,8 @@ blocks:
             - cache restore
             - sem-version ruby 2.6.0
             - bundle install --deployment --path vendor/bundle
-            - bundle exec rubocop
-            - bundle exec brakeman
-
+            - '#bundle exec rubocop'
+            - '#bundle exec brakeman'
   - name: Unit tests
     task:
       prologue:
@@ -40,17 +35,14 @@ blocks:
           - sem-service start postgres
           - sem-version ruby 2.6.0
           - bundle install --deployment --path vendor/bundle
-          - bundle exec rake db:setup
-
+          - 'bundle exec rake db:setup'
       jobs:
         - name: RSpec - model tests
           commands:
             - bundle exec rspec spec/models
-
         - name: RSpec - controller tests
           commands:
             - bundle exec rspec spec/controllers
-
   - name: Integration tests
     task:
       prologue:
@@ -60,8 +52,7 @@ blocks:
           - sem-service start postgres
           - sem-version ruby 2.6.0
           - bundle install --deployment --path vendor/bundle
-          - bundle exec rake db:setup
-
+          - 'bundle exec rake db:setup'
       jobs:
         - name: RSpec - feature specs
           commands:
