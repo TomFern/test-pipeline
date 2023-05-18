@@ -1,21 +1,68 @@
 
 version: v1.0
-name: Go project example
+name: My Ruby on Rails Project
+
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 
 blocks:
-  - name: Build project
+  - name: Setup
     task:
       jobs:
-      - name: Get Go packages
+        - name: bundle
+          commands:
+            - checkout
+            - cache restore
+            - sem-version ruby 2.6.0
+            - bundle install --deployment -j 4 --path vendor/bundle
+            - cache store
+
+  - name: Code scanning
+    task:
+      jobs:
+        - name: check style + security
+          commands:
+            - checkout
+            - cache restore
+            - sem-version ruby 2.6.0
+            - bundle install --deployment --path vendor/bundle
+            - bundle exec rubocop
+            - bundle exec brakeman
+
+  - name: Unit tests
+    task:
+      prologue:
         commands:
           - checkout
-          - sem-version go 1.12
-          - go get github.com/lib/pq
-          - go build webServer.go
-          - mkdir bin
-          - mv webServer bin
-          - cache store $(checksum webServer.go) bin
+          - cache restore
+          - sem-service start postgres
+          - sem-version ruby 2.6.0
+          - bundle install --deployment --path vendor/bundle
+          - bundle exec rake db:setup
+
+      jobs:
+        - name: RSpec - model tests
+          commands:
+            - bundle exec rspec spec/models
+
+        - name: RSpec - controller tests
+          commands:
+            - bundle exec rspec spec/controllers
+
+  - name: Integration tests
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+          - sem-service start postgres
+          - sem-version ruby 2.6.0
+          - bundle install --deployment --path vendor/bundle
+          - bundle exec rake db:setup
+
+      jobs:
+        - name: RSpec - feature specs
+          commands:
+            - bundle exec rspec spec/features
