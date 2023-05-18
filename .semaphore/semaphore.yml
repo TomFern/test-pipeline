@@ -11,8 +11,7 @@ blocks:
     task:
       # Create a secret for Docker Hub credentials
       secrets:
-        - name: dockerhub-secrets
-          type: env
+        - dockerhub
       prologue:
         commands:
           # Authenticate to Docker Hub
