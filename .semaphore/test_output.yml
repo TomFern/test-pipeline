@@ -1,0 +1,30 @@
+
+version: v1.0
+name: Go Build and Test
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: Build and Test
+    task:
+      prologue:
+        commands:
+          - checkout
+          - sem-version go 1.16
+          - go get ./...
+
+      jobs:
+        - name: Build
+          commands:
+            - go build -v ./...
+
+        - name: Test
+          commands:
+            - gotestsum --junitfile junit.xml ./...
+
+      epilogue:
+        always:
+          commands:
+            - test-results publish junit.xml
