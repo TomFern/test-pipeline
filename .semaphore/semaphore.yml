@@ -1,25 +1,21 @@
 
 version: v1.0
-name: Build and Test Go Project
+name: Go project example
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 
 blocks:
-  - name: Build and Store Artifact
+  - name: Build project
     task:
       jobs:
-        - name: Build
-          commands:
-            - checkout
-            - go build -o myapp
-            - artifact push workflow myapp
-
-  - name: Test
-    task:
-      jobs:
-        - name: Retrieve Artifact and Test
-          commands:
-            - artifact pull workflow myapp
-            - go test ./...
+      - name: Get Go packages
+        commands:
+          - checkout
+          - sem-version go 1.12
+          - go get github.com/lib/pq
+          - go build webServer.go
+          - mkdir bin
+          - mv webServer bin
+          - cache store $(checksum webServer.go) bin
