@@ -16,5 +16,5 @@ blocks:
         - name: Build and push
           commands:
             - checkout
-            - 'docker build -t <your-dockerhub-username>/<image-name>:<tag> .'
-            - 'docker push <your-dockerhub-username>/<image-name>:<tag>'
+            - 'docker build -t tomfern/test-pipeline:latest .'
+            - 'docker push tomfern/test-pipeline:latest'
