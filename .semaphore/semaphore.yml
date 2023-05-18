@@ -1,5 +1,5 @@
 
-version: "v1.0"
+version: v1.0
 name: Build and push
 agent:
   machine:
@@ -9,12 +9,12 @@ agent:
 blocks:
   - name: Build and push
     task:
-      # Create a secret for Docker Hub credentials
+      # Pull in environment variables from the "docker" secret
       secrets:
-        - dockerhub
+        - name: dockerhub-secrets
       prologue:
         commands:
-          # Authenticate to Docker Hub
+          # Authenticate to the registry for all jobs in the block
           - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
       jobs:
         - name: Build and push
