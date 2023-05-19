@@ -1,21 +1,59 @@
 version: v1.0
-name: Node.js Example Pipeline
+name: My Ruby on Rails CI pipeline on Semaphore
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Build and Cache Dependencies
+  - name: Setup
     task:
       jobs:
-        - name: Build and Cache
+        - name: bundle
           commands:
             - checkout
             - cache restore
-            - npm install
-            - npm run build
+            - sem-version ruby 2.6.0
+            - bundle install --deployment -j 4 --path vendor/bundle
             - cache store
-        - name: Test
+  - name: Code scanning
+    task:
+      jobs:
+        - name: check style + security
           commands:
+            - checkout
             - cache restore
-            - npm test
+            - sem-version ruby 2.6.0
+            - bundle install --deployment --path vendor/bundle
+            - bundle exec rubocop
+            - bundle exec brakeman
+  - name: Unit tests
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+          - sem-service start postgres
+          - sem-version ruby 2.6.0
+          - bundle install --deployment --path vendor/bundle
+          - 'bundle exec rake db:setup'
+      jobs:
+        - name: RSpec - model tests
+          commands:
+            - bundle exec rspec spec/models
+        - name: RSpec - controller tests
+          commands:
+            - bundle exec rspec spec/controllers
+  - name: Integration tests
+    task:
+      prologue:
+        commands:
+          - checkout
+          - cache restore
+          - sem-service start postgres
+          - sem-version ruby 2.6.0
+          - bundle install --deployment --path vendor/bundle
+          - 'bundle exec rake db:setup'
+      jobs:
+        - name: RSpec - feature specs
+          commands:
+            - bundle exec rspec spec/features
