@@ -1,20 +1,21 @@
 version: v1.0
-name: Build and push
+name: Node.js Example Pipeline
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Build and push
+  - name: Build and Cache Dependencies
     task:
-      secrets:
-        - name: dockerhub-secrets
-      prologue:
-        commands:
-          - 'echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin'
       jobs:
-        - name: Build and push
+        - name: Build and Cache
           commands:
             - checkout
-            - docker-compose build
-            - docker-compose push
+            - cache restore
+            - npm install
+            - npm run build
+            - cache store
+        - name: Test
+          commands:
+            - cache restore
+            - npm test
